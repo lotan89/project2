@@ -81,6 +81,14 @@
 	   </div>
 		
 		<script>
+			
+			//creating map object
+			var map = L.map("map", {center: [32.091000, 34.790000], zoom: 12});
+			L.tileLayer(
+		    	"https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", 
+		    	{attribution: "© OpenStreetMap"}
+			).addTo(map);
+			//
 			// connect to carto database
 			// define the url
 			var cartoUserName = "lotan89";
@@ -97,13 +105,7 @@
         			}
     			}).addTo(map);
 			});
-			//creating map object
-			var map = L.map("map", {center: [32.091000, 34.790000], zoom: 12});
-			L.tileLayer(
-		    	"https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", 
-		    	{attribution: "© OpenStreetMap"}
-			).addTo(map);
-			
+			//
 			//this function recive number of bikes and divide them to 4 categories and returns the color for that category
 			function getColor(freebikes) {
 				if(freebikes == 0) return "red"; else
