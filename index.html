@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html>
+	<head>
+	    <title>Tel-O-Fun Stations</title>
+			<link rel="stylesheet" href="https://unpkg.com/leaflet@1.3.1/dist/leaflet.css">
+			<script src="https://unpkg.com/leaflet@1.3.1/dist/leaflet.js"></script>
+			<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+		   <link rel="icon" type="image/png" href="bi_icon.png" />
+
+			<style>
+				body { margin:0; padding:0; text-align: right; }
+				#map { position:absolute; top:0; bottom:0; width:100%; }
+				.legend {
+					padding: 30px 30px;
+					background-color: rgba(255,255,255,0.9);
+					box-shadow: 0 0 15px rgba(0,0,0,0.2);
+					border-radius: 20px;
+				}
+				.legend i {
+					width: 15px;
+					height: 15px;
+					float: right;
+					margin-right: 20px;
+					opacity: 0.8;
+					border-radius: 50%;
+					border-style: solid;
+					border-width: 2px;
+				}
+				
+				.legend span {
+					font-size: 15px;
+					float: right;
+					margin-right: 20px;
+				}
+				
+				.legend b {
+					font-size: 15px;
+				}
+				
+				h1 {
+					position: absolute;
+					top: 10px;
+					right: 10px;
+					margin-top: 0;
+					padding: 10px 15px;
+					background-color: rgba(255, 255, 255, .9);
+					border: 1px solid grey;
+					border-radius: 10px;
+					z-index: 800;
+					font-family:Arial;
+				}
+				#description {
+					position: absolute;
+					bottom: 0;
+					right: 10px;
+					width: 280px;
+					margin-bottom: 20px;
+					padding: 0 15px;
+					background-color: rgba(255, 255, 255, .9);
+					border: 1px solid grey;
+					border-radius: 3px;
+					z-index: 800;
+					border-radius: 20px;
+					font-family:Arial;
+				}
+			</style>
+	</head>
+	<body>
+		<div dir="rtl">
+		    <h1>מפת זמינות אופניים בתחנות תל אופן</h1>
+			<div id="description">
+				<h2>על המפה</h2>
+				<p>המפה מציגה את פריסת תחנות "תל אופן" במרחב העיר תל אביב ושכנותיה. </p>
+				<p>כל תחנה צבועה בהתאם למספר האופניים הזמינים בה.</p>
+				<p>ניתן ללחוץ על תחנה על מנת לראות את הכתובת המדויקת, מספר האופניים הזמין ואת זמן העדכון.</p>
+				<p>המידע המוצג מקורו באתר GIS של עיריית תל אביב.</p>
+				<p>המפה נוצרה בידי לוטן סויד ודניאל צימרמן</p>
+			</div>
+		   
+		   <div id="map"></div>
+	   </div>
+		
+		<script>
+			// connect to carto database
+			// define the url
+			var cartoUserName = "lotan89";
+			var url = "https://" + cartoUserName + 
+    				".carto.com/api/v2/sql?format=GeoJSON&q=";
+			// define the sqlquery
+			var sqlQuery = "SELECT shemtachan, the_geom FROM bi_1 LIMIT 25";
+			
+			// call the carto sql api
+			$.getJSON(url + sqlQuery, function(data) {
+   				L.geoJSON(data, {
+       	 			onEachFeature: function (feature, layer) {
+            			layer.bindPopup(feature.properties.name_lat);
+        			}
+    			}).addTo(map);
+			});
+			//creating map object
+			var map = L.map("map", {center: [32.091000, 34.790000], zoom: 12});
+			L.tileLayer(
+		    	"https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", 
+		    	{attribution: "© OpenStreetMap"}
+			).addTo(map);
+			
+			//this function recive number of bikes and divide them to 4 categories and returns the color for that category
+			function getColor(freebikes) {
+				if(freebikes == 0) return "red"; else
+				if(freebikes <= 2) return "orange"; else
+				if(freebikes <= 5) return "yellow"; else
+				return "green"; 
+				}
+			//style for layer
+			function style(feature) {
+		    	return {
+			        fillColor: getColor(feature.properties.freebikes),
+			        radius: 6,
+					color: "#000",
+					weight: 1,
+					opacity: 1,
+					fillOpacity: 0.8
+		   		 };
+			}
+			//desription for pop-ups
+			function description(feature) {
+		    	return '<div class="popup" dir="rtl" style="text-align: right;">' + "<b>" +
+		    	feature.properties.Shemtachan + "<br></b>" +
+		    	"אופניים פנויים : " + feature.properties.freebikes + "<br>" +
+				"זמן עדכון : " + feature.properties.dateimport +
+		    	 "</div>";
+			}
+			//our data that we will use, came from shp.file from tel-aviv gis system 
+			var url ="bi.geojson";
+			// add the points layer to base map
+			$.getJSON(url, function(data) {
+				console.log(data);
+				L.geoJSON(
+					data,
+					{
+						onEachFeature: function(feature, layer) {layer.bindPopup(description(feature));},
+						style: style,
+						pointToLayer: function (feature, latlng) { return L.circleMarker(latlng);}
+					}
+				).addTo(map);
+			});
+			
+			//add legend to the map
+			var legend = L.control({position: "bottomleft"});
+			legend.onAdd = function(map) {
+				var div = L.DomUtil.create("div", "legend");        
+				div.innerHTML = '<b>כמות אופניים פנויים בתחנה</b><br>\<br>\
+					<i style="background-color: red"></i><span>0</span><br>\<br>\
+					<i style="background-color: orange"></i><span>1 - 2</span><br>\<br>\
+					<i style="background-color: yellow"></i><span>3 - 5</span><br>\<br>\
+					<i style="background-color: green"></i><span>6 +</span><br>\
+					'
+				return div;
+			};
+			legend.addTo(map);
+			
+		</script>
+
+	</body>
+</html>
