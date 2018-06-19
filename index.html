@@ -96,16 +96,15 @@
     				".carto.com/api/v2/sql?format=GeoJSON&q=";
 			// define the sqlquery
 			var sqlQuery = "SELECT shemtachan, the_geom FROM bi_1 LIMIT 25";
-			
 			// call the carto sql api
-			$.getJSON(url + sqlQuery, function(data) {
+			/*$.getJSON(url + sqlQuery, function(data) {
    				L.geoJSON(data, {
        	 				onEachFeature: function (feature, layer) {
             					layer.bindPopup(feature.properties.shemtachan);
         			}
     			}).addTo(map);
 			});
-			//
+			*/
 			//this function recive number of bikes and divide them to 4 categories and returns the color for that category
 			function getColor(freebikes) {
 				if(freebikes == 0) return "red"; else
