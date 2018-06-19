@@ -100,8 +100,8 @@
 			// call the carto sql api
 			$.getJSON(url + sqlQuery, function(data) {
    				L.geoJSON(data, {
-       	 			onEachFeature: function (feature, layer) {
-            			layer.bindPopup(feature.properties.name_lat);
+       	 				onEachFeature: function (feature, layer) {
+            					layer.bindPopup(feature.properties.shemtachan);
         			}
     			}).addTo(map);
 			});
