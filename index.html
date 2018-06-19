@@ -51,7 +51,7 @@ L.tileLayer("http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
 var bi_1Layer = L.layerGroup().addTo(map);
 var urlJSON = "https://lotan89.carto.com/api/v2/sql?q=";
 var urlGeoJSON = "https://lotan89.carto.com/api/v2/sql?format=GeoJSON&q=";
-var sqlQuery = "SELECT * FROM bi_1";
+var sqlQuery = "SELECT shemtachan, the_geom FROM bi_1";
 var freebikes = {};
 /*
 // Add empty dropdown menu
