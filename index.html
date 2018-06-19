@@ -1,0 +1,117 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="UTF-8">
+	<title>Species index</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.3.1/dist/leaflet.css"/>
+    <script src="https://unpkg.com/leaflet@1.3.1/dist/leaflet.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <style>
+    	body {
+            padding: 0;
+            margin: 0;
+        }
+        html, body, #map {
+            height: 100%;
+            width: 100%;
+        }
+        .dropdown {
+            min-width: 15em;
+            padding: 5px 10px 10px 10px;
+            background-color: rgba(255,255,255,0.8);
+            box-shadow: 0 0 15px rgba(0,0,0,0.2);
+            border-radius: 5px;
+        }
+        .dropdown h3 {
+            margin: 5px 0px 0px 0px;
+        }
+        #species, #genus {
+            width: 100%;
+			padding: 6px 8px;
+			font: 14px/16px Arial, Helvetica, sans-serif;
+			background-color: rgba(255,255,255,0.8);
+			box-shadow: 0 0 15px rgba(0,0,0,0.2);
+			border-radius: 5px;
+		}
+    </style>
+</head>
+<body>
+	<div id="map"></div>
+	<script>
+	
+var map = L.map("map").setView([32, 35], 8);
+
+L.tileLayer("http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+	maxZoom: 19,
+    attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+}).addTo(map);
+
+// Define variables
+var bi_1Layer = L.layerGroup().addTo(map);
+var urlJSON = "https://lotan89.carto.com/api/v2/sql?q=";
+var urlGeoJSON = "https://lotan89.carto.com/api/v2/sql?format=GeoJSON&q=";
+var sqlQuery = "SELECT * FROM bi_1 ORDER BY freebikes";
+var freebikes = {};
+
+// Add empty dropdown menu
+var legend = L.control({position: "topleft"});
+legend.onAdd = function (map) {
+    var div = L.DomUtil.create("div", "dropdown");
+    div.innerHTML = 
+        '<h3>Choose genus</h3>\
+        <select id="genus"></select><br>\
+        <h3>Choose species</h3>\
+        <select id="species"></select>';
+    return div;
+};
+legend.addTo(map);
+/*
+// Function to update species dropdown menu
+function updateSp() {
+	var selGenus = $("#genus").val();
+	$("#species").empty();
+	$.each(species[selGenus], function(index, value) {
+    	$("#species").append("<option>" + value + "</option>");
+	});
+}
+
+// Function to reload and display species observations
+function displaySpecies() {
+    plantsLayer.clearLayers();
+    var valueSelected = $("#species").val();
+    var sqlQuery2 = "SELECT * FROM plants WHERE name_lat = '" + valueSelected + "'";
+    $.getJSON(urlGeoJSON + sqlQuery2, function(data) {
+        L.geoJSON(data, {
+		    onEachFeature: function(feature, layer) {
+		        layer.bindPopup(feature.properties.name_lat);
+	      	}
+        }).addTo(plantsLayer);
+    });
+}
+
+
+// Load species list & bind event listeners
+$.getJSON(urlJSON + sqlQuery, function(data) {
+    $.each(data.rows, function(index, value) {
+        var tmp = value.name_lat;
+        var tmp_split = tmp.split(" ");
+        if(species[tmp_split[0]] === undefined) {
+            species[tmp_split[0]] = [tmp];
+            } else {
+                species[tmp_split[0]].push(tmp);
+            }
+	});
+	$.each(species, function(index, value) {
+        $("#genus").append("<option>" + index + "</option>");
+	});
+	$("#genus").on("change", updateSp);
+	$("#genus, #species").on("change", displaySpecies);
+	updateSp();
+	displaySpecies();
+});
+*/
+	</script>
+</body>
+</html>
+
